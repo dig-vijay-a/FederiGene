@@ -1,0 +1,72 @@
+# Environment variables
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv/
+venv/
+ENV/
+env/
+
+# Node / Frontend
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+dist/
+dist-ssr/
+*.local
+
+# Database
+*.db
+*.sqlite3
+federigene.db
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+.vs/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Uploads / Temp
+Backend/uploads/
+Backend/temp/
+Backend/temp_weights/
+scratch/
+
+# Keys / Secrets
+*.pfx
+*.p12
+*.key
+firebase-adminsdk.json
+
+# Build tools
+Backend/build/
+Backend/dist/
+*.spec

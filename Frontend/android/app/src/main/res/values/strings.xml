@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FederiGene</string>
+    <string name="title_activity_main">FederiGene</string>
+    <string name="package_name">com.federigene.app</string>
+    <string name="custom_url_scheme">com.federigene.app</string>
+</resources>

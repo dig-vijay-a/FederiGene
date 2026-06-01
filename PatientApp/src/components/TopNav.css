@@ -1,0 +1,170 @@
+.top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 1rem;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--card-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-logo {
+    height: 30px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.5));
+}
+
+.nav-title {
+    font-weight: 800;
+    font-size: 1.2rem;
+    letter-spacing: -0.5px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.theme-toggle {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.theme-toggle:hover {
+    opacity: 1;
+}
+
+.profile-menu {
+    position: relative;
+}
+
+.profile-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.profile-avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.profile-btn:hover .profile-avatar {
+    border-color: white;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    width: 250px;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.dropdown-header {
+    padding: 0.8rem;
+}
+
+.dropdown-menu hr {
+    border: none;
+    border-top: 1px solid var(--card-border);
+    margin: 0.2rem 0;
+}
+
+.dropdown-item {
+    padding: 0.8rem;
+    text-decoration: none;
+    color: var(--text-color);
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-size: 0.9rem;
+    cursor: pointer;
+    width: 100%;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.logout-btn {
+    color: #ef4444;
+}
+
+.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Light Theme Variables */
+body.light-theme {
+    --bg-color: #f8fafc;
+    --text-color: #0f172a;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+}
+
+body.light-theme .top-nav {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+body.light-theme .glass-card {
+    background: var(--card-bg);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme .input-field {
+    background: rgba(0, 0, 0, 0.05);
+    color: #0f172a;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .input-field::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+body.light-theme .nav-item {
+    color: #64748b;
+}
+
+body.light-theme .nav-item.active {
+    color: var(--accent-color);
+}
+
+body.light-theme .mobile-nav {
+    background: rgba(255, 255, 255, 0.9);
+}

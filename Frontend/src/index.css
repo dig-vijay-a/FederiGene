@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&display=swap');
+@import url('/FluentEmoji.css');
+
+:root {
+  --bg-color: #f8fafc;
+  --text-color: #0f172a;
+  --accent-color: #3b82f6;
+  --accent-rgb: 59, 130, 246;
+  --accent-hover: #2563eb;
+  --bg-rgb: 248, 250, 252;
+  --card-bg: rgba(255, 255, 255, 0.7);
+  --card-border: rgba(0, 0, 0, 0.08); /* More visible in light mode */
+  --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+  --toggle-bg: #cbd5e1;
+  --toggle-knob: #ffffff;
+  --gradient-bg: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+
+  color-scheme: light;
+  font-family: 'Inter', 'Fluent Emoji Color', 'Noto Color Emoji', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+/* Ensure premium 3D Fluent Emojis render consistently in all icon and UI containers */
+.emoji,
+.nav-icon,
+.item-icon,
+.stat-icon,
+.settings-tab span,
+.avatar-edit-badge,
+.btn-icon,
+.session-icon,
+.danger-zone h3,
+.security-stat-item .btn-icon,
+.reset-stat-btn .btn-icon {
+    font-family: 'Fluent Emoji Color', 'Noto Color Emoji', "Apple Color Emoji", "Segoe UI Emoji", "Twemoji Mozilla", sans-serif !important;
+    font-style: normal !important;
+    -webkit-text-fill-color: initial !important;
+    color: initial !important;
+}
+
+[data-theme='dark'] {
+  --bg-color: #0f172a;
+  --text-color: #f8fafc;
+  --accent-color: #60a5fa;
+  --accent-rgb: 96, 165, 250;
+  --accent-hover: #93c5fd;
+  --bg-rgb: 15, 23, 42;
+  --card-bg: rgba(30, 41, 59, 0.6);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --toggle-bg: #334155;
+  --toggle-knob: #0f172a;
+  --gradient-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background: var(--gradient-bg);
+  background-attachment: fixed;
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-view-file-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Global Form & Dropdown Styles */
+select, .form-input {
+  width: 100%;
+  padding: 12px 16px;
+  padding-right: 42px !important; /* Space for the arrow */
+  border-radius: 12px;
+  background-color: var(--card-bg);
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  font-family: inherit;
+  outline: none;
+  
+  /* Reset appearance */
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+  
+  /* Custom Arrow (Theme Aware Stroke) */
+  /* In Light Mode (--text-color is dark), we use a grey stroke. 
+     In Dark Mode (--text-color is light), we use a lighter stroke. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 16px !important;
+  
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Use SVG filter to match the text color for the arrow (cross-browser hack for currentColor in data-uri) */
+[data-theme='dark'] select, [data-theme='dark'] .form-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+}
+
+[data-theme='light'] select, [data-theme='light'] .form-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(0,0,0,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+}
+
+select:focus, .form-input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Fix for unreadable dropdown options */
+option {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  padding: 12px;
+}
+
+[data-theme='dark'] option {
+  background-color: #1e293b; 
+  color: #f8fafc;
+}
+
+[data-theme='light'] option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+/* Inputs shouldn't have the arrow */
+input.form-input {
+  background-image: none !important;
+  padding-right: 16px;
+  cursor: text;
+}
+
+/* --- Ultra-Modern Toast System --- */
+.toast-notification {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    min-width: 340px;
+    padding: 1rem 1.25rem;
+    background: rgba(15, 23, 42, 0.9); /* Deep Slate */
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 
+                0 0 15px rgba(var(--accent-rgb), 0.1);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    overflow: hidden;
+    transform: translateX(120%);
+    animation: toast-spring-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.toast-notification.error {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 
+                0 0 20px rgba(239, 68, 68, 0.15);
+}
+
+.toast-notification.success {
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), 
+                0 0 20px rgba(34, 197, 94, 0.15);
+}
+
+.toast-icon {
+    width: 42px;
+    height: 42px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.toast-notification.error .toast-icon {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.toast-notification.success .toast-icon {
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.toast-message {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, var(--accent-color));
+    opacity: 0.8;
+    filter: blur(1px);
+    animation: toast-timer 5s linear forwards;
+}
+
+.toast-notification.error .toast-progress {
+    background: linear-gradient(90deg, transparent, #ef4444);
+}
+
+.toast-notification.success .toast-progress {
+    background: linear-gradient(90deg, transparent, #22c55e);
+}
+
+@keyframes toast-spring-in {
+    to { transform: translateX(0); }
+}
+
+@keyframes toast-timer {
+    from { width: 100%; }
+    to { width: 0%; }
+}
+
+/* Light mode overrides for high visibility */
+[data-theme='light'] .toast-notification {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='light'] .toast-message {
+    color: #0f172a;
+}
+
+/* Modal CSS */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    backdrop-filter: blur(16px);
+}

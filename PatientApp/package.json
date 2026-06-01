@@ -1,0 +1,37 @@
+{
+  "name": "patientapp",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "static-serve": "npx serve dist",
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "cap:add:android": "npx cap add android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^5.7.0",
+    "@capacitor/app": "^5.0.7",
+    "@capacitor/core": "^5.7.0",
+    "@capacitor/haptics": "^5.0.7",
+    "@capacitor/keyboard": "^5.0.8",
+    "@capacitor/push-notifications": "^5.1.2",
+    "@capacitor/splash-screen": "^5.0.8",
+    "@capacitor/status-bar": "^5.0.7",
+    "axios": "^1.6.7",
+    "qrcode.react": "^4.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^5.7.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.1.4"
+  }
+}
