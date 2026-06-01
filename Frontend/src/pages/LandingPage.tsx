@@ -153,14 +153,14 @@ const LandingPage = () => {
                         </div>
                         <p>Manage your Genomic Passport, grant research consent, and track your FedCoin dividends.</p>
                         <button className="download-link-btn" style={{ marginTop: '2.5rem' }} onClick={() => {
-                            showToast("Downloading PatientApp-v29.apk...", "info");
-                            fetch('/PatientApp-v29.apk')
+                            showToast("Downloading PatientApp-Latest.apk...", "info");
+                            fetch('/PatientApp-Latest.apk')
                                 .then(response => response.blob())
                                 .then(blob => {
                                     const url = window.URL.createObjectURL(new Blob([blob]));
                                     const link = document.createElement('a');
                                     link.href = url;
-                                    link.download = 'PatientApp-v29.apk';
+                                    link.download = 'PatientApp-Latest.apk';
                                     document.body.appendChild(link);
                                     link.click();
                                     document.body.removeChild(link);
@@ -176,7 +176,7 @@ const LandingPage = () => {
                         </div>
                         <p>Desktop application for hospital administrators to manage local training nodes and datasets.</p>
                         <div className="download-options">
-                            <button className="download-link-btn" onClick={() => window.open('/download-windows-app', '_blank')}>Download .exe (Windows)</button>
+                            <button className="download-link-btn" onClick={() => window.open('/FederiGene-Windows-Setup.exe', '_blank')}>Download .exe (Windows)</button>
                             <button className="download-link-btn" disabled>Download .dmg (macOS)</button>
                         </div>
                     </div>
