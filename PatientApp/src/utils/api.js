@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: 'http://192.168.1.11:5173/api',
+    baseURL: import.meta.env.VITE_API_URL || 'https://federigene-backend.onrender.com/api',
     headers: {
         'Content-Type': 'application/json',
         'Bypass-Tunnel-Reminder': 'true'

@@ -4,7 +4,7 @@ const path = require('path');
 let mainWindow = null;
 let splashWindow = null;
 let tray = null;
-const BACKEND_URL = `http://10.26.51.159:8000`;
+const FRONTEND_URL = `https://federigene.com`;
 
 // ── Create the splash / loading screen ────────────────────────────────────────
 function createSplashWindow() {
@@ -52,7 +52,7 @@ function createMainWindow() {
 
   mainWindow.setMenuBarVisibility(false); // Double enforce no menu bar
 
-  mainWindow.loadURL(`${BACKEND_URL}/login`);
+  mainWindow.loadURL(`${FRONTEND_URL}/login`);
 
   mainWindow.once('ready-to-show', () => {
     if (splashWindow && !splashWindow.isDestroyed()) {
