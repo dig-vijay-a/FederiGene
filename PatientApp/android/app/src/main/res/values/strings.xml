@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FederiGene Patient</string>
+    <string name="title_activity_main">FederiGene Patient</string>
+    <string name="package_name">com.federigene.patientapp</string>
+    <string name="custom_url_scheme">com.federigene.patientapp</string>
+</resources>

@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: federigene-db-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: federigene-db
+spec:
+  selector:
+    matchLabels:
+      app: federigene-db
+  template:
+    metadata:
+      labels:
+        app: federigene-db
+    spec:
+      containers:
+      - name: db
+        image: mariadb:10.6
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: federigene-secrets
+              key: db-root-password
+        - name: MYSQL_DATABASE
+          value: federigene
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: db-storage
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: db-storage
+        persistentVolumeClaim:
+          claimName: federigene-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: federigene-db-svc
+spec:
+  selector:
+    app: federigene-db
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP

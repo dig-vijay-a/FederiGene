@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "937111902981",
+    "project_id": "federigene",
+    "storage_bucket": "federigene.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:937111902981:android:9c1a1b2fd3303ccf4eb56c",
+        "android_client_info": {
+          "package_name": "com.federigene.patientapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD2f3ECX0ptWgOu4rf0hy6JFYgm-QPi9E0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

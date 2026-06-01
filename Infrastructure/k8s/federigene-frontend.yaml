@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: federigene-frontend
+  labels:
+    app: federigene-frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: federigene-frontend
+  template:
+    metadata:
+      labels:
+        app: federigene-frontend
+    spec:
+      containers:
+      - name: frontend
+        image: federigene-frontend:latest
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "250m"
+            memory: "128Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: federigene-frontend-svc
+spec:
+  selector:
+    app: federigene-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP

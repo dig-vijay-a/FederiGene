@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./Backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite:///./federigene.db
+      - SECRET_KEY=OMEGA_SINGULARITY_KEY_2026
+      - ALGORITHM=HS256
+    volumes:
+      - ./Backend:/app
+    restart: always
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000
+    restart: always
+
+networks:
+  default:
+    name: federigene-network
