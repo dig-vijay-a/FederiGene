@@ -65,6 +65,7 @@ scratch/
 *.p12
 *.key
 firebase-adminsdk.json
+google-services.json
 
 # Build tools
 Backend/build/

@@ -1,9 +1,15 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/setupTests.ts'],
+    globals: true,
+  },
   server: {
     host: '0.0.0.0',
     // Proxy API calls through the HTTPS vite server to the HTTP backend
