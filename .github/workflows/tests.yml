@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
+# Grants the testing plugin permission to write the summary to the UI
+permissions:
+  contents: read
+  checks: write
+
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
