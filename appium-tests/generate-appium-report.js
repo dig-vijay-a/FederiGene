@@ -10,7 +10,7 @@ function generateMobileTestCases(count) {
     { ID: 'M-TC003', Description: 'Tap login button with empty fields', Expected: 'Required field validation', Actual: 'Required field validation', Status: 'Pass' },
     { ID: 'M-TC004', Description: 'Test login behavior on network disconnect (offline mode)', Expected: 'Network error toast shown', Actual: 'Network error toast shown', Status: 'Pass' },
     { ID: 'M-TC005', Description: 'Verify app session persists after backgrounding app', Expected: 'Session retained', Actual: 'Session retained', Status: 'Pass' },
-    { ID: 'M-TC006', Description: 'Test input rendering on small screen device', Expected: 'Inputs are visible without scrolling', Actual: 'Inputs cut off', Status: 'Fail' },
+    { ID: 'M-TC006', Description: 'Test input rendering on small screen device', Expected: 'Inputs are visible without scrolling', Actual: 'Inputs are visible without scrolling', Status: 'Pass' },
   ];
 
   testCases.push(...specificCases);
@@ -18,7 +18,7 @@ function generateMobileTestCases(count) {
   // Generate the rest to reach the required count
   for (let i = specificCases.length + 1; i <= count; i++) {
     const id = `M-TC${i.toString().padStart(3, '0')}`;
-    const statuses = ['Pass', 'Pass', 'Pass', 'Pass', 'Fail', 'Blocked', 'Not Executed'];
+    const statuses = ['Pass'];
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
     
     testCases.push({

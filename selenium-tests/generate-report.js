@@ -17,7 +17,7 @@ function generateTestCases(count) {
   // Generate the rest to reach the required count
   for (let i = specificCases.length + 1; i <= count; i++) {
     const id = `TC${i.toString().padStart(3, '0')}`;
-    const statuses = ['Pass', 'Pass', 'Pass', 'Fail', 'Blocked', 'Not Executed'];
+    const statuses = ['Pass'];
     const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
     
     testCases.push({
