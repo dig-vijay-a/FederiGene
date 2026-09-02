@@ -231,7 +231,6 @@ jobs:
   docker-scan:
     name: "🐳 Docker Security"
     runs-on: ubuntu-latest
-    if: hashFiles('Backend/Dockerfile') != '' || hashFiles('Dockerfile') != ''
     steps:
       - uses: actions/checkout@v4
 
