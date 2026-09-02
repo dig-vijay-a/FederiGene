@@ -181,8 +181,8 @@ jobs:
 
       - name: Install Trivy
         run: |
-          wget -q https://github.com/aquasecurity/trivy/releases/download/v0.56.1/trivy_0.56.1_Linux-64bit.tar.gz
-          tar -xzf trivy_0.56.1_Linux-64bit.tar.gz
+          wget -q https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz
+          tar -xzf trivy_0.74.0_Linux-64bit.tar.gz
           chmod +x trivy
 
       - name: Run Trivy Filesystem Scan
@@ -236,8 +236,8 @@ jobs:
 
       - name: Scan Dockerfile with Trivy
         run: |
-          wget -q https://github.com/aquasecurity/trivy/releases/download/v0.56.1/trivy_0.56.1_Linux-64bit.tar.gz
-          tar -xzf trivy_0.56.1_Linux-64bit.tar.gz
+          wget -q https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz
+          tar -xzf trivy_0.74.0_Linux-64bit.tar.gz
           chmod +x trivy
           
           echo "🐳 Scanning Dockerfile for misconfigurations..."
