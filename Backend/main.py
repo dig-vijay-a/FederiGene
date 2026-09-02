@@ -16,8 +16,8 @@ from database.config import engine, get_db, Base
 
 # Initialize Firebase Admin SDK
 try:
-    cred = credentials.Certificate("firebase-adminsdk.json")
-    firebase_admin.initialize_app(cred)
+    # Use default credentials (loads from GOOGLE_APPLICATION_CREDENTIALS env var)
+    firebase_admin.initialize_app()
     print("Firebase Admin SDK initialized successfully.")
 except Exception as e:
     print(f"Warning: Failed to initialize Firebase Admin SDK: {e}")

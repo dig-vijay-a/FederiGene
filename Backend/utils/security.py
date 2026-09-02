@@ -14,14 +14,7 @@ import base64
 # SECURITY FIX (HIGH-001): Fail loudly if SECRET_KEY is not set instead of using a weak default
 _secret = os.getenv("SECRET_KEY")
 if not _secret:
-    import warnings
-    warnings.warn(
-        "SECRET_KEY environment variable is not set! Using insecure fallback. "
-        "This MUST be set before production deployment.",
-        RuntimeWarning,
-        stacklevel=2
-    )
-    _secret = "INSECURE_FALLBACK_KEY_SET_SECRET_KEY_ENV_VAR"
+    raise ValueError("SECRET_KEY environment variable is not set! This MUST be set before starting the application.")
 SECRET_KEY = _secret
 ALGORITHM = "HS256"
 # SECURITY FIX (HIGH-005): Reduced token lifetime from 720min (12h) to 60min (1h)

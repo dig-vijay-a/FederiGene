@@ -10,14 +10,7 @@ from typing import List
 # SECURITY FIX (CRIT-003): Load HMAC secret from environment variable instead of hardcoding
 _hmac_secret_str = os.getenv("PLATFORM_HMAC_SECRET")
 if not _hmac_secret_str:
-    import warnings
-    warnings.warn(
-        "PLATFORM_HMAC_SECRET is not set! Using insecure default. "
-        "Set this environment variable before deploying to production.",
-        RuntimeWarning,
-        stacklevel=2
-    )
-    _hmac_secret_str = "INSECURE_DEFAULT_CHANGE_ME_IN_PRODUCTION"
+    raise ValueError("PLATFORM_HMAC_SECRET environment variable is not set! This MUST be set before starting the application.")
 PLATFORM_HMAC_SECRET = _hmac_secret_str.encode("utf-8")
 
 # ─── TenSEAL Real HE (with graceful fallback) ─────────────────────────────────
