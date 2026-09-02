@@ -116,7 +116,7 @@ def finalize_fedcoin_purchase(
     return {"message": f"Success! {pack['amount']} FedCoins have been added to your balance.", "new_balance": user.fedcoin_balance}
 
 @router.get("/tiers")
-def list_subscription_tiers():
+async def list_subscription_tiers():
     """Returns details for all available subscription tiers."""
     return TIER_DETAILS
 

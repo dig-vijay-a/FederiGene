@@ -3,3 +3,21 @@
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# SECURITY FIX (CRIT-001 & CRIT-002): Never commit secrets to Git
+.env
+.env.*
+firebase-adminsdk.json
+google-services.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Temp files
+temp/
+temp_weights/
+uploads/
+scratch/

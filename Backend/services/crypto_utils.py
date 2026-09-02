@@ -7,7 +7,18 @@ import random
 from datetime import datetime
 from typing import List
 
-PLATFORM_HMAC_SECRET = b"federigene_secure_aggregation_secret_2026"
+# SECURITY FIX (CRIT-003): Load HMAC secret from environment variable instead of hardcoding
+_hmac_secret_str = os.getenv("PLATFORM_HMAC_SECRET")
+if not _hmac_secret_str:
+    import warnings
+    warnings.warn(
+        "PLATFORM_HMAC_SECRET is not set! Using insecure default. "
+        "Set this environment variable before deploying to production.",
+        RuntimeWarning,
+        stacklevel=2
+    )
+    _hmac_secret_str = "INSECURE_DEFAULT_CHANGE_ME_IN_PRODUCTION"
+PLATFORM_HMAC_SECRET = _hmac_secret_str.encode("utf-8")
 
 # ─── TenSEAL Real HE (with graceful fallback) ─────────────────────────────────
 # Attempt to load TenSEAL. If not installed, fall back to simulation.

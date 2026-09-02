@@ -101,6 +101,10 @@ def revoke_consent(
     consent = db.query(ConsentLedger).filter(ConsentLedger.id == consent_id).first()
     if not consent:
         raise HTTPException(status_code=404, detail="Consent record not found")
+    
+    # SECURITY FIX (MED-007): Verify the user owns this consent or is an admin
+    if consent.patient_id != user.id and user.role != "platform_admin":
+        raise HTTPException(status_code=403, detail="You can only revoke your own consent records")
         
     consent.revoked_at = datetime.utcnow()
     
@@ -125,6 +129,10 @@ def gdpr_delete_request(
     consent = db.query(ConsentLedger).filter(ConsentLedger.id == consent_id).first()
     if not consent:
         raise HTTPException(status_code=404, detail="Consent record not found")
+    
+    # SECURITY FIX (MED-008): Verify the user owns this consent or is an admin
+    if consent.patient_id != user.id and user.role != "platform_admin":
+        raise HTTPException(status_code=403, detail="You can only request GDPR deletion for your own records")
         
     consent.gdpr_delete_requested = True
     

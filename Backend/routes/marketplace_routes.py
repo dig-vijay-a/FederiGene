@@ -21,7 +21,7 @@ class PublishRequest(BaseModel):
     description: str
 
 @router.post("/models/{model_id}/publish")
-async def publish_model(model_id: int, req: PublishRequest, db: Session = Depends(get_db)):
+async def publish_model(model_id: int, req: PublishRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
     Publishes a local model version to the global commercial marketplace.
     """
@@ -95,14 +95,14 @@ async def get_my_wallet(user: User = Depends(get_current_user), db: Session = De
     }
 
 @router.get("/wallet/{entity_id}")
-async def get_wallet_balance(entity_id: str, db: Session = Depends(get_db)):
+async def get_wallet_balance(entity_id: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
     Returns the FedCoin balance and total earnings for a specific organization or researcher.
     """
     return marketplace_engine.get_wallet_balance(db, entity_id)
 
 @router.post("/subscribe")
-async def subscribe_to_model(req: SubscriptionRequest, db: Session = Depends(get_db)):
+async def subscribe_to_model(req: SubscriptionRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """
     Purchases API inference credits for a commercial model using FedCoin.
     Triggers automated revenue sharing (Smart Contract simulation) back to original data providers.

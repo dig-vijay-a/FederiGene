@@ -20,7 +20,7 @@ def webauthn_register_options(req: schemas.WebAuthnRegisterOptionsRequest, db: S
     return auth_controller.generate_webauthn_register_options(req, db)
 
 @router.get("/pre-reg-totp")
-def get_pre_reg_totp(email: str):
+async def get_pre_reg_totp(email: str):
     return auth_controller.get_pre_reg_totp(email)
 
 @router.post("/register", response_model=schemas.RegisterResponse)

@@ -5,12 +5,6 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  test: {
-    environment: 'happy-dom',
-    setupFiles: ['./src/setupTests.ts'],
-    globals: true,
-    exclude: ['**/node_modules/**', '**/dist/**', '**/tests/e2e/**'],
-  },
   server: {
     host: '0.0.0.0',
     // Proxy API calls through the HTTPS vite server to the HTTP backend

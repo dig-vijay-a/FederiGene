@@ -1,8 +1,9 @@
 import logging
 import os
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
 
 # Load environment variables
 load_dotenv()
@@ -33,6 +34,27 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="FederiGene Auth API")
 
+from anyio import CapacityLimiter
+from anyio.lowlevel import RunVar
+
+@app.on_event("startup")
+def startup_event():
+    # Increase AnyIO threadpool from 40 to 200 to handle many concurrent DB requests
+    RunVar("_default_thread_limiter").set(CapacityLimiter(200))
+
+# SECURITY FIX (LOW-004): Add security headers to all responses
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
 # Serve uploaded avatars
 import os
 uploads_dir = os.path.join(os.path.dirname(__file__), "uploads")
@@ -47,12 +69,18 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
+# SECURITY FIX (CRIT-004): Restrict CORS to known frontend origins instead of wildcard "*"
+_allowed_origins = [
+    os.getenv("FRONTEND_URL", "http://localhost:5173"),
+    "https://federigene.com",
+    "https://www.federigene.com",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "Accept"],
 )
 
 # Standard Security Questions (Normally seeded in DB)
@@ -123,7 +151,7 @@ app.include_router(synthetic_routes.router)
 app.include_router(trust_routes.router)
 app.include_router(edge_routes.router)
 app.include_router(multimodal_routes.router)
-app.include_router(marketplace_routes.router)
+# SECURITY FIX (LOW-006): Removed duplicate marketplace_routes.router mount
 app.include_router(sovereignty_routes.router)
 app.include_router(agent_routes.router)
 app.include_router(quantum_routes.router)

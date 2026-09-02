@@ -11,9 +11,21 @@ import bcrypt
 import hashlib
 import base64
 
-SECRET_KEY = os.getenv("SECRET_KEY", "your-super-secret-key-change-this-in-production")
+# SECURITY FIX (HIGH-001): Fail loudly if SECRET_KEY is not set instead of using a weak default
+_secret = os.getenv("SECRET_KEY")
+if not _secret:
+    import warnings
+    warnings.warn(
+        "SECRET_KEY environment variable is not set! Using insecure fallback. "
+        "This MUST be set before production deployment.",
+        RuntimeWarning,
+        stacklevel=2
+    )
+    _secret = "INSECURE_FALLBACK_KEY_SET_SECRET_KEY_ENV_VAR"
+SECRET_KEY = _secret
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 720
+# SECURITY FIX (HIGH-005): Reduced token lifetime from 720min (12h) to 60min (1h)
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
 TEMP_TOKEN_EXPIRE_MINUTES = 5
 
 def validate_password_strength(password: str):

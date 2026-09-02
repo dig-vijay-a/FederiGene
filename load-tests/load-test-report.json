@@ -1,0 +1,34 @@
+{
+  "test_config": {
+    "virtual_users": 100,
+    "duration_seconds": 60.002866983413696,
+    "endpoints_tested": 10,
+    "timestamp": "2026-09-02T09:09:49.179755"
+  },
+  "throughput": {
+    "total_requests": 24566,
+    "total_data_transferred_kb": 12404.45,
+    "rps_average": 409.41,
+    "rps_max": 619,
+    "rps_min": 102
+  },
+  "response_time_ms": {
+    "average": 244.62,
+    "min": 73.57,
+    "max": 1052.27,
+    "median_p50": 207.02,
+    "p90": 406.84,
+    "p95": 468.78,
+    "p99": 720.17,
+    "stdev": 124.92
+  },
+  "reliability": {
+    "success_count": 24566,
+    "error_count": 0,
+    "error_rate_percent": 0.0
+  },
+  "status_codes": {
+    "200": 22092,
+    "422": 2474
+  }
+}

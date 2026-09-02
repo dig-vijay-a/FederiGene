@@ -154,22 +154,8 @@ def login_user(req: schemas.LoginRequest, request: Request, db: Session):
     if not user or not auth_utils.verify_password(req.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Incorrect email/username or password")
     
-    # ── 1-FACTOR LOGIN BYPASS (Admin, Tester for Mobile Testing) ──
-    if user.role in ["platform_admin", "tester"]:
-        access_token_expires = timedelta(minutes=auth_utils.ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token, jti = auth_utils.create_access_token(
-            data={"sub": user.email}, expires_delta=access_token_expires
-        )
-        # Create session record
-        session = models.UserSession(
-            user_id=user.id, token_jti=jti,
-            device_info=request.headers.get("user-agent", "Admin Bypass"),
-            ip_address=request.client.host if request.client else "Unknown"
-        )
-        db.add(session)
-        db.commit()
-        return {"message": "Administrative access granted.", "requires_step": 0, "access_token": access_token, "token_type": "bearer", "user": user}
-
+    # SECURITY FIX (HIGH-002): Removed admin/tester 2FA bypass.
+    # All roles must now complete the full multi-factor authentication pipeline.
     temp_token = auth_utils.create_temp_token(user.email, "2fa_pending")
     
     # NEW: Check for email verification
@@ -350,7 +336,8 @@ def handle_forgot_password(req: schemas.ForgotPasswordRequest, db: Session):
         return {"message": "If an account exists, an OTP has been sent."}
     
     otp_code = str(random.randint(100000, 999999))
-    print(f"-- OTP for {user.email}: {otp_code} --")
+    # SECURITY FIX (MED-002): OTP is sent via email only, never logged to console
+    logging.getLogger(__name__).info(f"Password reset OTP generated for {user.email}")
     
     db.add(models.VerificationToken(
         user_id=user.id, token=otp_code, purpose="PASSWORD_RESET_OTP",
@@ -407,6 +394,12 @@ def reset_password_logic(req: schemas.ResetPasswordRequest, db: Session):
         raise HTTPException(status_code=401, detail="Invalid or expired reset token")
         
     user = db.query(models.User).filter(models.User.email == payload.get("sub")).first()
+    
+    # SECURITY FIX (HIGH-007): Validate password strength on reset
+    is_valid, pwd_error = auth_utils.validate_password_strength(req.new_password)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=pwd_error)
+    
     user.password_hash = auth_utils.get_password_hash(req.new_password)
     db.commit()
     return {"message": "Password reset successfully. You can now login."}
@@ -418,8 +411,10 @@ def change_password_logic(user: models.User, req: schemas.ChangePasswordRequest,
     if req.new_password != req.confirm_password:
         raise HTTPException(status_code=400, detail="New passwords do not match")
     
-    if len(req.new_password) < 8:
-        raise HTTPException(status_code=400, detail="New password must be at least 8 characters")
+    # SECURITY FIX (HIGH-007): Apply full password strength validation on change
+    is_valid, pwd_error = auth_utils.validate_password_strength(req.new_password)
+    if not is_valid:
+        raise HTTPException(status_code=400, detail=pwd_error)
         
     user.password_hash = auth_utils.get_password_hash(req.new_password)
     db.commit()

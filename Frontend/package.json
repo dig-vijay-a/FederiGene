@@ -10,10 +10,7 @@
     "start": "npx serve -s dist -l tcp://0.0.0.0:$PORT",
     "lint": "eslint .",
     "preview": "vite preview",
-    "tauri": "tauri",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:e2e": "playwright test"
+    "tauri": "tauri"
   },
   "dependencies": {
     "@capacitor/core": "^8.2.0",

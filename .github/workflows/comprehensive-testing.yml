@@ -1,0 +1,134 @@
+name: "🧪 Comprehensive Testing & Reports"
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # ─── 1. SECURITY REPORT GENERATION ────────────────────────────
+  security-reports:
+    name: "🔒 Generate Security Reports"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: |
+          cd VulnerabilityTestResults
+          npm install exceljs || npm install --no-save exceljs
+
+      - name: Generate Security Excel Reports
+        run: |
+          node VulnerabilityTestResults/generate-security-reports.js
+
+      - name: Upload Security Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: Security-Reports
+          path: VulnerabilityTestResults/*.xlsx
+          retention-days: 30
+
+  # ─── 2. SELENIUM E2E TESTS (WEB) ──────────────────────────────
+  selenium-e2e:
+    name: "🌐 Selenium Web E2E Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies & Run Tests
+        working-directory: ./selenium-tests
+        run: |
+          npm install
+          node generate-report.js
+
+      - name: Upload Selenium Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Selenium-Web-Report
+          path: selenium-tests/*.xlsx
+          retention-days: 30
+
+  # ─── 3. APPIUM E2E TESTS (MOBILE) ─────────────────────────────
+  appium-e2e:
+    name: "📱 Appium Mobile E2E Tests"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies & Run Tests
+        working-directory: ./appium-tests
+        run: |
+          npm install
+          node generate-appium-report.js
+
+      - name: Upload Appium Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Appium-Mobile-Report
+          path: appium-tests/*.xlsx
+          retention-days: 30
+
+  # ─── 4. BASELINE LOAD TESTING ─────────────────────────────────
+  load-testing:
+    name: "⚡ API Baseline Load Test"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Backend Dependencies
+        working-directory: ./Backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install uvicorn
+
+      - name: Start Backend Server
+        working-directory: ./Backend
+        run: |
+          # Copy example env
+          cp .env.example .env
+          # Start in background
+          python -m uvicorn main:app --host 0.0.0.0 --port 8000 &
+          # Wait for server to be ready
+          sleep 5
+          curl --retry 5 --retry-connrefused http://localhost:8000/health || true
+
+      - name: Run Load Test
+        working-directory: ./load-tests
+        run: |
+          pip install aiohttp openpyxl
+          # Run a shorter CI load test (50 users for 20 seconds)
+          python baseline_load_test.py --users 50 --duration 20
+
+      - name: Upload Load Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: API-Load-Test-Report
+          path: load-tests/*.xlsx
+          retention-days: 30

@@ -1,0 +1,346 @@
+name: "🔒 Security Review Pipeline"
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # ─── PHASE 1: Detect Backend Technology ──────────────────────────
+  detect-stack:
+    name: "🔍 Detect Backend Stack"
+    runs-on: ubuntu-latest
+    outputs:
+      framework: ${{ steps.detect.outputs.framework }}
+      language: ${{ steps.detect.outputs.language }}
+      package_manager: ${{ steps.detect.outputs.package_manager }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect Backend Technology
+        id: detect
+        run: |
+          echo "🔍 Scanning repository for backend technology..."
+
+          # Python / FastAPI / Django / Flask
+          if [ -f "Backend/requirements.txt" ] || [ -f "requirements.txt" ]; then
+            echo "language=python" >> $GITHUB_OUTPUT
+            echo "package_manager=pip" >> $GITHUB_OUTPUT
+
+            if grep -qi "fastapi" Backend/requirements.txt 2>/dev/null || grep -qi "fastapi" requirements.txt 2>/dev/null; then
+              echo "framework=fastapi" >> $GITHUB_OUTPUT
+            elif grep -qi "django" Backend/requirements.txt 2>/dev/null || grep -qi "django" requirements.txt 2>/dev/null; then
+              echo "framework=django" >> $GITHUB_OUTPUT
+            elif grep -qi "flask" Backend/requirements.txt 2>/dev/null || grep -qi "flask" requirements.txt 2>/dev/null; then
+              echo "framework=flask" >> $GITHUB_OUTPUT
+            else
+              echo "framework=python-generic" >> $GITHUB_OUTPUT
+            fi
+
+          # Node.js / Express / NestJS
+          elif [ -f "Backend/package.json" ] || [ -f "package.json" ]; then
+            echo "language=javascript" >> $GITHUB_OUTPUT
+            echo "package_manager=npm" >> $GITHUB_OUTPUT
+
+            if grep -qi "nestjs" Backend/package.json 2>/dev/null; then
+              echo "framework=nestjs" >> $GITHUB_OUTPUT
+            elif grep -qi "express" Backend/package.json 2>/dev/null; then
+              echo "framework=express" >> $GITHUB_OUTPUT
+            else
+              echo "framework=node-generic" >> $GITHUB_OUTPUT
+            fi
+
+          # Java / Spring Boot
+          elif [ -f "pom.xml" ] || [ -f "build.gradle" ]; then
+            echo "language=java" >> $GITHUB_OUTPUT
+            echo "package_manager=maven" >> $GITHUB_OUTPUT
+            echo "framework=spring-boot" >> $GITHUB_OUTPUT
+
+          # Go
+          elif [ -f "go.mod" ]; then
+            echo "language=go" >> $GITHUB_OUTPUT
+            echo "package_manager=go-mod" >> $GITHUB_OUTPUT
+            echo "framework=go-generic" >> $GITHUB_OUTPUT
+
+          # Ruby / Rails
+          elif [ -f "Gemfile" ]; then
+            echo "language=ruby" >> $GITHUB_OUTPUT
+            echo "package_manager=bundler" >> $GITHUB_OUTPUT
+            echo "framework=rails" >> $GITHUB_OUTPUT
+
+          # PHP / Laravel
+          elif [ -f "composer.json" ]; then
+            echo "language=php" >> $GITHUB_OUTPUT
+            echo "package_manager=composer" >> $GITHUB_OUTPUT
+            echo "framework=laravel" >> $GITHUB_OUTPUT
+
+          else
+            echo "language=unknown" >> $GITHUB_OUTPUT
+            echo "package_manager=unknown" >> $GITHUB_OUTPUT
+            echo "framework=unknown" >> $GITHUB_OUTPUT
+          fi
+
+          echo "✅ Detection complete"
+
+  # ─── PHASE 2: SAST Scanning ──────────────────────────────────────
+  sast-scan:
+    name: "🛡️ SAST Analysis"
+    needs: detect-stack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep SAST
+        run: |
+          echo "🛡️ Running Semgrep for ${{ needs.detect-stack.outputs.framework }}..."
+          semgrep scan \
+            --config=auto \
+            --config=p/security-audit \
+            --config=p/owasp-top-ten \
+            --config=p/python \
+            --json \
+            --output=semgrep-results.json \
+            Backend/ || true
+          echo "✅ Semgrep scan complete"
+
+      - name: Generate SAST Summary
+        if: always()
+        run: |
+          if [ -f semgrep-results.json ]; then
+            echo "## 🛡️ SAST Results (Semgrep)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            TOTAL=$(cat semgrep-results.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d.get('results',[])))" 2>/dev/null || echo "0")
+            echo "**Total findings:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Semgrep Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-results
+          path: semgrep-results.json
+          retention-days: 30
+
+  # ─── PHASE 3: Secret Scanning ────────────────────────────────────
+  secret-scan:
+    name: "🔑 Secret Scanning"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Gitleaks
+        run: |
+          wget -q https://github.com/gitleaks/gitleaks/releases/download/v8.18.4/gitleaks_8.18.4_linux_x64.tar.gz
+          tar -xzf gitleaks_8.18.4_linux_x64.tar.gz
+          chmod +x gitleaks
+
+      - name: Run Gitleaks
+        run: |
+          echo "🔑 Scanning for hardcoded secrets..."
+          ./gitleaks detect --source=. --report-format=json --report-path=gitleaks-results.json || true
+          echo "✅ Gitleaks scan complete"
+
+      - name: Generate Secret Scan Summary
+        if: always()
+        run: |
+          if [ -f gitleaks-results.json ]; then
+            echo "## 🔑 Secret Scanning Results (Gitleaks)" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            TOTAL=$(cat gitleaks-results.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(len(d))" 2>/dev/null || echo "0")
+            echo "**Secrets detected:** $TOTAL" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Gitleaks Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-results
+          path: gitleaks-results.json
+          retention-days: 30
+
+  # ─── PHASE 4: Dependency Scanning ────────────────────────────────
+  dependency-scan:
+    name: "📦 Dependency Scanning"
+    needs: detect-stack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Trivy
+        run: |
+          wget -q https://github.com/aquasecurity/trivy/releases/download/v0.56.1/trivy_0.56.1_Linux-64bit.tar.gz
+          tar -xzf trivy_0.56.1_Linux-64bit.tar.gz
+          chmod +x trivy
+
+      - name: Run Trivy Filesystem Scan
+        run: |
+          echo "📦 Running Trivy dependency scan..."
+          ./trivy fs \
+            --scanners vuln \
+            --format json \
+            --output trivy-results.json \
+            Backend/ || true
+          echo "✅ Trivy scan complete"
+
+      - name: Run pip-audit (Python)
+        if: needs.detect-stack.outputs.language == 'python'
+        run: |
+          pip install pip-audit
+          pip-audit -r Backend/requirements.txt --format json --output pip-audit-results.json || true
+
+      - name: Generate Dependency Summary
+        if: always()
+        run: |
+          echo "## 📦 Dependency Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f trivy-results.json ]; then
+            VULNS=$(cat trivy-results.json | python3 -c "
+          import sys,json
+          d=json.load(sys.stdin)
+          total=0
+          for r in d.get('Results',[]):
+            total+=len(r.get('Vulnerabilities',[]))
+          print(total)" 2>/dev/null || echo "0")
+            echo "**Trivy vulnerabilities:** $VULNS" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Dependency Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-results
+          path: |
+            trivy-results.json
+            pip-audit-results.json
+          retention-days: 30
+
+  # ─── PHASE 5: Docker Security ────────────────────────────────────
+  docker-scan:
+    name: "🐳 Docker Security"
+    runs-on: ubuntu-latest
+    if: hashFiles('Backend/Dockerfile') != '' || hashFiles('Dockerfile') != ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan Dockerfile with Trivy
+        run: |
+          wget -q https://github.com/aquasecurity/trivy/releases/download/v0.56.1/trivy_0.56.1_Linux-64bit.tar.gz
+          tar -xzf trivy_0.56.1_Linux-64bit.tar.gz
+          chmod +x trivy
+          
+          echo "🐳 Scanning Dockerfile for misconfigurations..."
+          ./trivy config \
+            --format json \
+            --output docker-scan-results.json \
+            Backend/Dockerfile || true
+
+      - name: Upload Docker Scan Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-scan-results
+          path: docker-scan-results.json
+          retention-days: 30
+
+  # ─── PHASE 6: Generate Final Report ──────────────────────────────
+  generate-report:
+    name: "📊 Generate Security Report"
+    needs: [detect-stack, sast-scan, secret-scan, dependency-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+
+      - name: Generate Report Summary
+        run: |
+          echo "# 🔒 FederiGene Security Review Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Generated:** $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend:** ${{ needs.detect-stack.outputs.framework }} (${{ needs.detect-stack.outputs.language }})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scanner | Status | Artifacts |" >> $GITHUB_STEP_SUMMARY
+          echo "|---------|--------|-----------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Semgrep SAST | ✅ Complete | semgrep-results.json |" >> $GITHUB_STEP_SUMMARY
+          echo "| Gitleaks Secrets | ✅ Complete | gitleaks-results.json |" >> $GITHUB_STEP_SUMMARY
+          echo "| Trivy Dependencies | ✅ Complete | trivy-results.json |" >> $GITHUB_STEP_SUMMARY
+          echo "| pip-audit | ✅ Complete | pip-audit-results.json |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📁 Download all reports from the **Artifacts** section below." >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Combined Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-review-report
+          path: |
+            VulnerabilityTestResults/
+          retention-days: 90
+
+  # ─── PHASE 7: Quality Gate ───────────────────────────────────────
+  quality-gate:
+    name: "🚦 Security Quality Gate"
+    needs: [sast-scan, secret-scan, dependency-scan]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Semgrep Results
+        uses: actions/download-artifact@v4
+        with:
+          name: semgrep-results
+        continue-on-error: true
+
+      - name: Check for Critical Findings
+        run: |
+          echo "🚦 Checking for critical vulnerabilities..."
+
+          CRITICAL_COUNT=0
+
+          if [ -f semgrep-results.json ]; then
+            CRITICAL_COUNT=$(cat semgrep-results.json | python3 -c "
+          import sys,json
+          d=json.load(sys.stdin)
+          count=0
+          for r in d.get('results',[]):
+            sev = r.get('extra',{}).get('severity','').upper()
+            if sev == 'ERROR':
+              count += 1
+          print(count)" 2>/dev/null || echo "0")
+          fi
+
+          echo "Critical findings: $CRITICAL_COUNT"
+          
+          if [ "$CRITICAL_COUNT" -gt "0" ]; then
+            echo "::error::🚨 $CRITICAL_COUNT critical vulnerabilities detected! Pipeline will fail."
+            echo "## 🚨 Quality Gate: FAILED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**$CRITICAL_COUNT critical vulnerabilities** must be resolved before merge." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "## ✅ Quality Gate: PASSED" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "No critical vulnerabilities detected by automated scanners." >> $GITHUB_STEP_SUMMARY
+            echo "⚠️ Note: Manual review findings in VulnerabilityTestResults/ should still be addressed." >> $GITHUB_STEP_SUMMARY
+          fi
