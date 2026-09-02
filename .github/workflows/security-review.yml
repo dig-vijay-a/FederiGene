@@ -179,21 +179,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Trivy
-        run: |
-          wget -q https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz
-          tar -xzf trivy_0.74.0_Linux-64bit.tar.gz
-          chmod +x trivy
-
       - name: Run Trivy Filesystem Scan
-        run: |
-          echo "📦 Running Trivy dependency scan..."
-          ./trivy fs \
-            --scanners vuln \
-            --format json \
-            --output trivy-results.json \
-            Backend/ || true
-          echo "✅ Trivy scan complete"
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: 'Backend/'
+          format: 'json'
+          output: 'trivy-results.json'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
 
       - name: Run pip-audit (Python)
         if: needs.detect-stack.outputs.language == 'python'
@@ -235,16 +229,13 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Scan Dockerfile with Trivy
-        run: |
-          wget -q https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz
-          tar -xzf trivy_0.74.0_Linux-64bit.tar.gz
-          chmod +x trivy
-          
-          echo "🐳 Scanning Dockerfile for misconfigurations..."
-          ./trivy config \
-            --format json \
-            --output docker-scan-results.json \
-            Backend/Dockerfile || true
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'config'
+          scan-ref: 'Backend/Dockerfile'
+          format: 'json'
+          output: 'docker-scan-results.json'
+          ignore-unfixed: true
 
       - name: Upload Docker Scan Results
         if: always()

@@ -1,34 +1,34 @@
 {
   "test_config": {
     "virtual_users": 100,
-    "duration_seconds": 60.002866983413696,
+    "duration_seconds": 5.004005432128906,
     "endpoints_tested": 10,
-    "timestamp": "2026-09-02T09:09:49.179755"
+    "timestamp": "2026-09-02T10:40:13.305944"
   },
   "throughput": {
-    "total_requests": 24566,
-    "total_data_transferred_kb": 12404.45,
-    "rps_average": 409.41,
-    "rps_max": 619,
-    "rps_min": 102
+    "total_requests": 750,
+    "total_data_transferred_kb": 379.95,
+    "rps_average": 149.88,
+    "rps_max": 179,
+    "rps_min": 5
   },
   "response_time_ms": {
-    "average": 244.62,
-    "min": 73.57,
-    "max": 1052.27,
-    "median_p50": 207.02,
-    "p90": 406.84,
-    "p95": 468.78,
-    "p99": 720.17,
-    "stdev": 124.92
+    "average": 33.42,
+    "min": 10.81,
+    "max": 323.53,
+    "median_p50": 27.46,
+    "p90": 51.9,
+    "p95": 59.48,
+    "p99": 83.97,
+    "stdev": 27.66
   },
   "reliability": {
-    "success_count": 24566,
+    "success_count": 750,
     "error_count": 0,
     "error_rate_percent": 0.0
   },
   "status_codes": {
-    "200": 22092,
-    "422": 2474
+    "200": 675,
+    "422": 75
   }
 }
