@@ -281,6 +281,20 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "📁 Download all reports from the **Artifacts** section below." >> $GITHUB_STEP_SUMMARY
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies & Generate Excel Report
+        run: |
+          cd VulnerabilityTestResults
+          npm install xlsx || npm install --no-save xlsx
+          cd ..
+          # Ensure downloaded json files are accessible in the root or copied to the script folder if needed
+          # Actually the script will run in root and read them from the current directory (where download-artifact placed them)
+          node VulnerabilityTestResults/generate-security-reports.js
+
       - name: Upload Combined Report
         uses: actions/upload-artifact@v4
         with:

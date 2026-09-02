@@ -11,33 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  # ─── 1. SECURITY REPORT GENERATION ────────────────────────────
-  security-reports:
-    name: "🔒 Generate Security Reports"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Dependencies
-        run: |
-          cd VulnerabilityTestResults
-          npm install xlsx || npm install --no-save xlsx
-
-      - name: Generate Security Excel Reports
-        run: |
-          node VulnerabilityTestResults/generate-security-reports.js
-
-      - name: Upload Security Reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: Security-Reports
-          path: VulnerabilityTestResults/*.xlsx
-          retention-days: 30
 
   # ─── 2. SELENIUM E2E TESTS (WEB) ──────────────────────────────
   selenium-e2e:
