@@ -127,8 +127,9 @@ jobs:
           python baseline_load_test.py --users 50 --duration 20
 
       - name: Upload Load Test Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: API-Load-Test-Report
-          path: load-tests/*.xlsx
+          path: load-tests/*
           retention-days: 30
