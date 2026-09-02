@@ -40,7 +40,7 @@ class AtomicPrivacyService:
             "encryption_id": enc_id,
             "data_packet_ref": data_packet_id,
             "dna_lattice_coordinates": f"Helix-A-{random.randint(1, 1000)}:Base-{random.randint(1, 4)}",
-            "derivation_protocol": "Genomic-LHE-v2",
+            "derivation_protocol": "Genomic-LHE-v2", # gitleaks:allow
             "status": "Embedded"
         }
 

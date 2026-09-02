@@ -111,7 +111,7 @@ class BlockchainManager:
         """
         Creates a Smart Contract-based Data Usage Agreement (DUA) on the ledger.
         """
-        contract_address = "0x" + hashlib.sha1(str(uuid.uuid4()).encode()).hexdigest() + "a1"
+        contract_address = "0x" + hashlib.sha256(str(uuid.uuid4()).encode()).hexdigest()[:40]
         
         txn = {
             "txn_id": "0x" + hashlib.sha256(str(uuid.uuid4()).encode()).hexdigest(),

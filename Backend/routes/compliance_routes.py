@@ -95,7 +95,7 @@ def generate_compliance_report(
 
     # Evidence mapping
     report = {
-        "report_id": f"COMP-{job_id}-{hashlib.md5(str(datetime.utcnow()).encode()).hexdigest()[:8]}",
+        "report_id": f"COMP-{job_id}-{hashlib.sha256(str(datetime.utcnow()).encode()).hexdigest()[:8]}",
         "generated_at": datetime.utcnow().isoformat(),
         "job_title": job.name,
         "privacy_metrics": {

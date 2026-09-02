@@ -7,7 +7,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=sqlite:///./federigene.db
-      - SECRET_KEY=REDACTED_KEY
+      - SECRET_KEY=${SECRET_KEY:-default_insecure_key_for_dev_only}
       - ALGORITHM=HS256
     volumes:
       - ./Backend:/app

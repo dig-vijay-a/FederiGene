@@ -168,7 +168,7 @@ def request_tier_upgrade(
             msg = "Your organization has been successfully downgraded to the Community / Free plan."
         else:
             org.subscription_expires_at = datetime.utcnow() + timedelta(days=365)
-            org.license_key = f"FG-{tier.upper()[:3]}-{hashlib.md5(org.name.encode()).hexdigest()[:12].upper()}"
+            org.license_key = f"FG-{tier.upper()[:3]}-{hashlib.sha256(org.name.encode()).hexdigest()[:12].upper()}"
             msg = f"Payment Successful! You are now subscribed to the {tier.capitalize()} tier."
             
         db.add(AuditLog(
@@ -333,7 +333,7 @@ def approve_sales_lead(
     org = db.query(Organization).filter(Organization.id == lead.org_id).first()
     org.subscription_tier = SubscriptionTier.INSTITUTIONAL
     org.subscription_expires_at = datetime.utcnow() + timedelta(days=365)
-    org.license_key = f"FG-INS-{hashlib.md5(org.name.encode()).hexdigest()[:12].upper()}"
+    org.license_key = f"FG-INS-{hashlib.sha256(org.name.encode()).hexdigest()[:12].upper()}"
     
     lead.status = SalesLeadStatus.APPROVED
     lead.resolved_at = datetime.utcnow()
@@ -457,7 +457,7 @@ def finalize_invoice_payment(invoice_id: str, db: Session = Depends(get_db)):
     org.subscription_expires_at = datetime.utcnow() + timedelta(days=365)
     
     # Generate enterprise license key
-    org.license_key = f"FG-INS-{hashlib.md5(org.name.encode()).hexdigest()[:12].upper()}"
+    org.license_key = f"FG-INS-{hashlib.sha256(org.name.encode()).hexdigest()[:12].upper()}"
     
     lead.status = SalesLeadStatus.APPROVED
     lead.resolved_at = datetime.utcnow()

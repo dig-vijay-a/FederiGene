@@ -43,7 +43,8 @@ def seed():
 
     # 4. Create API Key for Local Node
     key_name = "Default Node Key"
-    raw_key = "fg_test_key_REDACTED"
+    import secrets
+    raw_key = f"fg_test_key_{secrets.token_hex(8)}"
     key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
     
     existing_key = db.query(platform_models.APIKey).filter(platform_models.APIKey.key_hash == key_hash).first()
