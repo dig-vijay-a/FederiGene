@@ -7,6 +7,7 @@
 # SECURITY FIX (CRIT-001 & CRIT-002): Never commit secrets to Git
 .env
 .env.*
+!.env.example
 firebase-adminsdk.json
 google-services.json
 
