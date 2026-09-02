@@ -29,5 +29,9 @@ COPY . .
 # Expose the API port
 EXPOSE 8000
 
+# Add non-root user
+RUN useradd -m appuser && chown -R appuser /app
+USER appuser
+
 # Start Uvicorn for production
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
