@@ -74,6 +74,9 @@ _allowed_origins = [
     os.getenv("FRONTEND_URL", "http://localhost:5173"),
     "https://federigene.com",
     "https://www.federigene.com",
+    "http://localhost",
+    "capacitor://localhost",
+    "ionic://localhost"
 ]
 app.add_middleware(
     CORSMiddleware,
