@@ -10,3 +10,5 @@ services:
         sync: false # You will set this manually in the Render Dashboard
       - key: PYTHON_VERSION
         value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
