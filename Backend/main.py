@@ -78,9 +78,10 @@ _allowed_origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app", # Allow any Vercel deployment dynamically
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "Accept"],
+    allow_methods=["*"],
+    allow_headers=["*"], # Allow all headers (e.g. from Axios/Fetch)
 )
 
 # Standard Security Questions (Normally seeded in DB)
