@@ -153,14 +153,14 @@ const LandingPage = () => {
                         </div>
                         <p>Manage your Genomic Passport, grant research consent, and track your FedCoin dividends.</p>
                         <button className="download-link-btn" style={{ marginTop: '2.5rem' }} onClick={() => {
-                            showToast("Downloading PatientApp-Latest.apk...", "info");
-                            fetch('/PatientApp-Latest.apk')
+                            showToast("Downloading FederiGene-PatientApp.apk...", "info");
+                            fetch('/FederiGene-PatientApp.apk')
                                 .then(response => response.blob())
                                 .then(blob => {
                                     const url = window.URL.createObjectURL(new Blob([blob]));
                                     const link = document.createElement('a');
                                     link.href = url;
-                                    link.download = 'PatientApp-Latest.apk';
+                                    link.download = 'FederiGene-PatientApp.apk';
                                     document.body.appendChild(link);
                                     link.click();
                                     document.body.removeChild(link);
