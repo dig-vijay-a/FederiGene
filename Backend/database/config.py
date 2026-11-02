@@ -6,12 +6,27 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # We will use SQLite by default for standalone desktop installations,
-# but you can provide a MySQL URL in the .env file in this format:
+# but you can provide a MySQL/PostgreSQL URL in the .env file in this format:
 # DATABASE_URL=mysql+pymysql://username:password@localhost:3306/federigene
+# DATABASE_URL=postgresql://user:password@localhost:5432/federigene
 SQLALCHEMY_DATABASE_URL = os.getenv(
     "DATABASE_URL", 
     "sqlite:///./federigene.db" # Default fallback for standalone .exe
 )
+
+# Normalize PostgreSQL URLs for SQLAlchemy & cloud hosting providers (Render, Supabase, Neon)
+if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Ensure PostgreSQL uses psycopg2 if psycopg (v3) is not installed
+if SQLALCHEMY_DATABASE_URL.startswith("postgresql+psycopg://") or SQLALCHEMY_DATABASE_URL.startswith("postgresql://"):
+    try:
+        import psycopg  # noqa: F401
+    except ImportError:
+        if SQLALCHEMY_DATABASE_URL.startswith("postgresql+psycopg://"):
+            SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgresql+psycopg://", "postgresql+psycopg2://", 1)
+        elif SQLALCHEMY_DATABASE_URL.startswith("postgresql://"):
+            SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
     # SQLite concurrency optimizations
