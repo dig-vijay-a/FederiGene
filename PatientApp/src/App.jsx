@@ -66,7 +66,10 @@ function App() {
                 await PushNotifications.addListener('registration', token => {
                     console.log('Push registration success, token: ' + token.value);
                     localStorage.setItem('fcm_token', token.value);
-                    api.post('/patient/fcm-token', { token: token.value }).catch(err => console.error("Failed to update FCM token", err));
+                    // Prevent infinite reload loop: Only send to backend if user is actually logged in
+                    if (localStorage.getItem('access_token')) {
+                        api.post('/patient/fcm-token', { token: token.value }).catch(err => console.error("Failed to update FCM token", err));
+                    }
                 });
 
                 await PushNotifications.addListener('pushNotificationReceived', notification => {

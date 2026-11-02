@@ -12,9 +12,9 @@ def seed():
     platform_models.Base.metadata.create_all(bind=engine)
 
     # 2. Find or Create User
-    user = db.query(auth_models.User).filter(auth_models.User.username == "digvijay").first()
+    user = db.query(auth_models.User).filter(auth_models.User.username == "sysadmin").first()
     if not user:
-        print("User 'digvijay' not found. Please register first.")
+        print("User 'sysadmin' not found. Please register first.")
         return
 
     # 3. Create Organizations
@@ -67,8 +67,25 @@ def seed():
         db.add(job1)
         db.commit()
         db.refresh(job1)
+        
+        # 5.5 Create Dataset
+        dataset1 = db.query(platform_models.Dataset).filter(platform_models.Dataset.id == 1).first()
+        if not dataset1:
+            dataset1 = platform_models.Dataset(
+                org_id=ucsf.id,
+                registered_by=user.id,
+                name="UCSF Oncology Baseline",
+                data_type="genomic",
+                row_count=1000,
+                feature_count=10,
+                status="active"
+            )
+            db.add(dataset1)
+            db.commit()
+            db.refresh(dataset1)
+
         # Invite UCSF
-        db.add(platform_models.TrainingParticipant(job_id=job1.id, dataset_id=1, org_id=ucsf.id, status="training"))
+        db.add(platform_models.TrainingParticipant(job_id=job1.id, dataset_id=dataset1.id, org_id=ucsf.id, status="training"))
         print(f"Created Job: {job1.name} (ID: {job1.id})")
 
     # 6. Create Marketplace Models

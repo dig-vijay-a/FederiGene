@@ -135,12 +135,11 @@ function App() {
                   <Route path="/analysis/query" element={<FederatedQuery />} />
                   <Route path="/analysis/sandbox" element={<PrivacySandbox />} />
                   <Route path="/analysis/population" element={<PopulationHealth />} />
+                  {/* Futuristic routes commented out for clean presentation:
                   <Route path="/analysis/singularity" element={<UniversalIntelligence />} />
                   <Route path="/analysis/omega" element={<OmegaBiosphere />} />
                   <Route path="/analysis/steering" element={<EvolutionarySteering />} />
                   <Route path="/analysis/multimodal" element={<MultiModalIQ />} />
-                  <Route path="/admin/health" element={<SystemObservability />} />
-                  <Route path="/admin/compliance" element={<RegulatoryCompliance />} />
                   <Route path="/admin/sovereignty" element={<GlobalSovereignty />} />
                   <Route path="/admin/interplanetary" element={<InterplanetaryLedger />} />
                   <Route path="/admin/immunity" element={<ImmunityFirewall />} />
@@ -151,16 +150,19 @@ function App() {
                   <Route path="/clinical/bios" element={<SyntheticOS />} />
                   <Route path="/clinical/collective" element={<CollectiveIntelligence />} />
                   <Route path="/clinical/validation" element={<ExpertValidation />} />
+                  <Route path="/security/atomic" element={<AtomicPrivacy />} />
+                  <Route path="/security/quantum" element={<QuantumShield />} />
+                  */}
+                  <Route path="/admin/health" element={<SystemObservability />} />
+                  <Route path="/admin/compliance" element={<RegulatoryCompliance />} />
                   <Route path="/org/settings" element={<OrgSettings />} />
                   <Route path="/settings/account" element={<AccountSettings />} />
                   <Route path="/security" element={<SecurityDashboard />} />
                   <Route path="/security/integrity" element={<SecurityIntegrity />} />
                   <Route path="/security/keys" element={<KeyManagement />} />
-                  <Route path="/security/atomic" element={<AtomicPrivacy />} />
                   <Route path="/security/access" element={<AccessControl />} />
                   <Route path="/security/audit" element={<AuditLogs />} />
                   <Route path="/security/trust" element={<TrustExplorer />} />
-                  <Route path="/security/quantum" element={<QuantumShield />} />
                   <Route path="/security/compliance/:id" element={<ComplianceReport />} />
                   <Route path="/marketplace" element={<MarketplaceHome />} />
                   <Route path="/marketplace/commercial" element={<CommercialMarketplace />} />

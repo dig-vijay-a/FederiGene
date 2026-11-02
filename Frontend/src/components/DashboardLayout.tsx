@@ -23,11 +23,11 @@ const NAV_ITEMS = {
         { path: '/analysis/query', icon: '🧪', label: 'Federated Analytics' },
         { path: '/analysis/sandbox', icon: '🧬', label: 'Privacy Sandbox' },
         { path: '/analysis/population', icon: '📈', label: 'Population Health' },
-        { path: '/analysis/singularity', icon: '🧠', label: 'Universal Intelligence' },
-        { path: '/analysis/omega', icon: '🌌', label: 'Omega Biosphere' },
-        { path: '/analysis/steering', icon: '🧬', label: 'Evolutionary Steering' },
-        { path: '/analysis/multimodal', icon: '👁️', label: 'Multi-Modal IQ' },
-
+        // Futuristic modules commented out for core demonstration:
+        // { path: '/analysis/singularity', icon: '🧠', label: 'Universal Intelligence' },
+        // { path: '/analysis/omega', icon: '🌌', label: 'Omega Biosphere' },
+        // { path: '/analysis/steering', icon: '🧬', label: 'Evolutionary Steering' },
+        // { path: '/analysis/multimodal', icon: '👁️', label: 'Multi-Modal IQ' },
     ],
     org: [
         { path: '/org/profile', icon: '🏥', label: 'Organization' },
@@ -43,28 +43,29 @@ const NAV_ITEMS = {
         { path: '/security', icon: '🔐', label: 'Security Overview' },
         { path: '/security/integrity', icon: '💎', label: 'System Integrity' },
         { path: '/security/keys', icon: '🔑', label: 'Key Management' },
-        { path: '/security/atomic', icon: '⚛️', label: 'Atomic Privacy' },
+        // { path: '/security/atomic', icon: '⚛️', label: 'Atomic Privacy' },
         { path: '/security/access', icon: '🛡️', label: 'Access Control' },
         { path: '/security/audit', icon: '📋', label: 'Audit Logs' },
         { path: '/security/trust', icon: '⛓️', label: 'Trust Explorer' },
-        { path: '/security/quantum', icon: '⚛️', label: 'Quantum Shield' },
+        // { path: '/security/quantum', icon: '⚛️', label: 'Quantum Shield' },
     ],
     clinical: [
-        { path: '/clinical/validation', icon: '👨‍⚕️', label: 'HITL Validation' },
-        { path: '/clinical/agents', icon: '🤖', label: 'Autonomous Agents' },
-        { path: '/clinical/synthesis', icon: '🧬', label: 'Biogenetic Synthesis' },
-        { path: '/clinical/neural', icon: '🧠', label: 'Neural Co-Evolution' },
-        { path: '/clinical/bios', icon: '🔌', label: 'Synthetic Bio-OS' },
-        { path: '/clinical/collective', icon: '🧠', label: 'Collective Intelligence' },
+        // Futuristic clinical concepts commented out:
+        // { path: '/clinical/validation', icon: '👨‍⚕️', label: 'HITL Validation' },
+        // { path: '/clinical/agents', icon: '🤖', label: 'Autonomous Agents' },
+        // { path: '/clinical/synthesis', icon: '🧬', label: 'Biogenetic Synthesis' },
+        // { path: '/clinical/neural', icon: '🧠', label: 'Neural Co-Evolution' },
+        // { path: '/clinical/bios', icon: '🔌', label: 'Synthetic Bio-OS' },
+        // { path: '/clinical/collective', icon: '🧠', label: 'Collective Intelligence' },
     ],
     admin: [
         { path: '/admin/approvals', icon: '✅', label: 'Org Approvals' },
         { path: '/admin/sales-leads', icon: '💼', label: 'Sales Leads' },
         { path: '/admin/users', icon: '👥', label: 'All Users' },
         { path: '/admin/health', icon: '💚', label: 'System Health' },
-        { path: '/admin/interplanetary', icon: '🚀', label: 'Interplanetary Ledger' },
-        { path: '/admin/immunity', icon: '🛡️', label: 'Immunity Firewall' },
-        { path: '/admin/guardian', icon: '💎', label: 'Eternal Guardian' },
+        // { path: '/admin/interplanetary', icon: '🚀', label: 'Interplanetary Ledger' },
+        // { path: '/admin/immunity', icon: '🛡️', label: 'Immunity Firewall' },
+        // { path: '/admin/guardian', icon: '💎', label: 'Eternal Guardian' },
     ]
 };
 
@@ -154,16 +155,18 @@ export default function DashboardLayout() {
                         ))}
                     </div>
 
-                    <div className="nav-section">
-                        <span className="nav-section-label">Clinical Suite</span>
-                        {NAV_ITEMS.clinical.map(item => (
-                            <NavLink key={item.path} to={item.path}
-                                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-                                <span className="nav-icon">{item.icon}</span>
-                                <span className="nav-label">{item.label}</span>
-                            </NavLink>
-                        ))}
-                    </div>
+                    {NAV_ITEMS.clinical.length > 0 && (
+                        <div className="nav-section">
+                            <span className="nav-section-label">Clinical Suite</span>
+                            {NAV_ITEMS.clinical.map(item => (
+                                <NavLink key={item.path} to={item.path}
+                                    className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
+                                    <span className="nav-icon">{item.icon}</span>
+                                    <span className="nav-label">{item.label}</span>
+                                </NavLink>
+                            ))}
+                        </div>
+                    )}
 
                     <div className="nav-section">
                         <span className="nav-section-label">Organization</span>
