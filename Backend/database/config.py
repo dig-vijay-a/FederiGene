@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.pool import NullPool
 import os
 from dotenv import load_dotenv
 
@@ -20,6 +21,14 @@ SQLALCHEMY_DATABASE_URL = os.getenv(
 # Normalize PostgreSQL URLs for SQLAlchemy & cloud hosting providers (Render, Supabase, Neon)
 if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
     SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Detect Supabase connection pooler
+is_supabase_pooler = "pooler.supabase.com" in SQLALCHEMY_DATABASE_URL
+
+# In Supabase Pooler, port 5432 is Session mode (restricted to max 15 clients: EMAXCONNSESSION).
+# Port 6543 is Transaction mode (designed for serverless/multi-client web servers like Render).
+if is_supabase_pooler and ":5432" in SQLALCHEMY_DATABASE_URL:
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace(":5432", ":6543")
 
 # Ensure PostgreSQL uses psycopg2 if psycopg (v3) is not installed
 if SQLALCHEMY_DATABASE_URL.startswith("postgresql+psycopg://") or SQLALCHEMY_DATABASE_URL.startswith("postgresql://"):
@@ -48,14 +57,25 @@ if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
         cursor.execute("PRAGMA journal_mode=WAL")
         cursor.execute("PRAGMA synchronous=NORMAL")
         cursor.close()
+elif is_supabase_pooler or ":6543" in SQLALCHEMY_DATABASE_URL:
+    # Supabase Transaction Pooler (Supavisor on port 6543)
+    # Using NullPool and disabling prepared statements prevents EMAXCONNSESSION (pool_size: 15) and prepared statement errors
+    connect_args = {"prepare_threshold": None}
+    engine = create_engine(
+        SQLALCHEMY_DATABASE_URL,
+        poolclass=NullPool,
+        connect_args=connect_args,
+        pool_pre_ping=True
+    )
 else:
-    # Production Database (MySQL/PostgreSQL) optimizations
+    # Production Database (MySQL/PostgreSQL) with conservative pool sizes
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL, 
-        pool_size=20, 
-        max_overflow=50,
+        pool_size=5, 
+        max_overflow=5,
         pool_timeout=30,
-        pool_recycle=1800
+        pool_recycle=300,
+        pool_pre_ping=True
     )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
