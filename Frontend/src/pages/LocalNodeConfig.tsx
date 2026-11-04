@@ -28,6 +28,23 @@ export default function LocalNodeConfig() {
     const [jobId, setJobId] = useState('');
     const [dataPath, setDataPath] = useState('');
     const [epochs, setEpochs] = useState(10);
+    const [availableJobs, setAvailableJobs] = useState<any[]>([]);
+
+    useEffect(() => {
+        api.get('/platform/training')
+            .then(res => {
+                if (Array.isArray(res.data) && res.data.length > 0) {
+                    setAvailableJobs(res.data);
+                    const activeJob = res.data.find((j: any) => 
+                        String(j.status).toUpperCase() === 'RUNNING' || String(j.status).toUpperCase() === 'PENDING'
+                    ) || res.data[0];
+                    if (activeJob) {
+                        setJobId(String(activeJob.id));
+                    }
+                }
+            })
+            .catch(() => {});
+    }, []);
 
     const resolveApiUrl = (endpoint: string) => {
         let base = (platformUrl || '').trim().replace(/\/+$/, '');
@@ -215,13 +232,31 @@ export default function LocalNodeConfig() {
 
                     <div className="form-group">
                         <label>Assigned Job ID</label>
-                        <input 
-                            type="number" 
-                            value={jobId} 
-                            onChange={(e) => setJobId((e.target as any).value)}
-                            placeholder="e.g. 1"
-                            disabled={isRunning}
-                        />
+                        {availableJobs.length > 0 ? (
+                            <select 
+                                className="form-input"
+                                value={jobId} 
+                                onChange={(e) => setJobId(e.target.value)}
+                                disabled={isRunning}
+                                style={{ width: '100%', padding: '10px', borderRadius: '8px', background: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid rgba(255,255,255,0.1)' }}
+                            >
+                                <option value="">-- Select a Training Job --</option>
+                                {availableJobs.map((j: any) => (
+                                    <option key={j.id} value={j.id}>
+                                        Job #{j.id}: {j.name} ({j.status?.toUpperCase()})
+                                    </option>
+                                ))}
+                            </select>
+                        ) : (
+                            <input 
+                                type="number" 
+                                value={jobId} 
+                                onChange={(e) => setJobId((e.target as any).value)}
+                                placeholder="e.g. 2"
+                                disabled={isRunning}
+                            />
+                        )}
+                        <small style={{ opacity: 0.5, fontSize: '0.75rem' }}>Select the federated training job this local node is contributing to.</small>
                     </div>
 
                     <div className="form-group">

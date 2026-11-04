@@ -515,10 +515,24 @@ def submit_training_update(
         
     org_id = key_record.org_id
 
-    # 1. Verify job exists and is running
+    # 1. Verify job exists and is active
     job = db.query(TrainingJob).filter(TrainingJob.id == job_id).first()
-    if not job or job.status != TrainingJobStatus.RUNNING:
-        raise HTTPException(status_code=400, detail="Job is not active")
+    if not job:
+        raise HTTPException(status_code=404, detail=f"Training Job #{job_id} not found")
+        
+    if job.status == TrainingJobStatus.COMPLETED:
+        raise HTTPException(status_code=400, detail=f"Training Job #{job_id} has already completed all {job.total_rounds} rounds")
+
+    if job.status == TrainingJobStatus.FAILED:
+        raise HTTPException(status_code=400, detail=f"Training Job #{job_id} has failed and cannot accept updates")
+
+    # If job is pending, auto-activate it on node submission so training proceeds seamlessly
+    if job.status == TrainingJobStatus.PENDING:
+        job.status = TrainingJobStatus.RUNNING
+        job.started_at = datetime.utcnow()
+        if job.current_round == 0:
+            job.current_round = 1
+        db.commit()
         
     # 2. Verify participant belongs to this job
     participant = db.query(TrainingParticipant).filter(
