@@ -16,7 +16,11 @@ export default function LocalNodeConfig() {
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             return `${window.location.protocol}//${window.location.hostname}:8000`;
         }
-        // In cloud / production deployment, use the origin
+        // On federigene.com domain, default to the Render backend service
+        if (window.location.hostname.includes('federigene.com')) {
+            return 'https://federigene-backend.onrender.com';
+        }
+        // In other cloud deployments, use the origin
         return window.location.origin;
     };
     const [platformUrl, setPlatformUrl] = useState(getInitialUrl());
@@ -27,6 +31,13 @@ export default function LocalNodeConfig() {
 
     const resolveApiUrl = (endpoint: string) => {
         let base = (platformUrl || '').trim().replace(/\/+$/, '');
+        // Automatically sanitize accidental :8000 on production domains (e.g. https://www.federigene.com:8000)
+        if (!base.includes('localhost') && !base.includes('127.0.0.1')) {
+            base = base.replace(/:8000\/?$/, '');
+            if (base.includes('federigene.com')) {
+                base = 'https://federigene-backend.onrender.com';
+            }
+        }
         if (base.endsWith('/api')) {
             base = base.slice(0, -4);
         }
