@@ -254,17 +254,28 @@ def get_dataset(dataset_id: int, user: User = Depends(get_current_user), db: Ses
 @router.get("/datasets")
 def list_datasets(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """List datasets visible to the current user."""
-    if user.role == "platform_admin":
+    if user.role in ("platform_admin", "researcher"):
         datasets = db.query(Dataset).all()
     else:
         membership = db.query(OrgMembership).filter(OrgMembership.user_id == user.id).first()
         if not membership:
-            return []
-        datasets = db.query(Dataset).filter(Dataset.org_id == membership.org_id).all()
+            datasets = db.query(Dataset).filter(Dataset.status == DatasetStatus.ACTIVE).all()
+        else:
+            datasets = db.query(Dataset).filter(
+                (Dataset.org_id == membership.org_id) | (Dataset.status == DatasetStatus.ACTIVE)
+            ).all()
     
-    return [{"id": d.id, "name": d.name, "data_type": d.data_type, "row_count": d.row_count,
-             "feature_count": d.feature_count, "status": d.status.value, "consent_type": d.consent_type,
-             "quality_score": d.quality_score, "zkp_verified": d.zkp_verified,
+    return [{"id": d.id, 
+             "name": f"{d.name} ({d.organization.name})" if d.organization else d.name,
+             "raw_name": d.name,
+             "org_name": d.organization.name if d.organization else None,
+             "data_type": d.data_type, 
+             "row_count": d.row_count,
+             "feature_count": d.feature_count, 
+             "status": d.status.value, 
+             "consent_type": d.consent_type,
+             "quality_score": d.quality_score, 
+             "zkp_verified": d.zkp_verified,
              "created_at": str(d.created_at)} for d in datasets]
 
 
