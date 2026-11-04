@@ -9,9 +9,12 @@ load_dotenv()
 # but you can provide a MySQL/PostgreSQL URL in the .env file in this format:
 # DATABASE_URL=mysql+pymysql://username:password@localhost:3306/federigene
 # DATABASE_URL=postgresql://user:password@localhost:5432/federigene
+_backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_default_db_path = os.path.join(_backend_dir, "federigene.db").replace("\\", "/")
+
 SQLALCHEMY_DATABASE_URL = os.getenv(
     "DATABASE_URL", 
-    "sqlite:///./federigene.db" # Default fallback for standalone .exe
+    f"sqlite:///{_default_db_path}"
 )
 
 # Normalize PostgreSQL URLs for SQLAlchemy & cloud hosting providers (Render, Supabase, Neon)

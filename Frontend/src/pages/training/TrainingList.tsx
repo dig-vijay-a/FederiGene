@@ -12,7 +12,7 @@ export default function TrainingList() {
     const [selectedDatasetIds, setSelectedDatasetIds] = useState<number[]>([]);
     const [loading, setLoading] = useState(true);
     const [showCreate, setShowCreate] = useState(false);
-    const [form, setForm] = useState({ name: '', description: '', model_architecture: 'cnn', target_metric: 'accuracy', privacy_budget: 1.0, total_rounds: 10 });
+    const [form, setForm] = useState({ name: '', description: '', model_architecture: 'mlp', target_metric: 'accuracy', privacy_budget: 1.0, total_rounds: 10 });
     const [error, setError] = useState<any>(null);
 
     const fetchData = (isInitial = false) => {
@@ -54,7 +54,7 @@ export default function TrainingList() {
                 dataset_ids: selectedDatasetIds
             });
             setShowCreate(false);
-            setForm({ name: '', description: '', model_architecture: 'cnn', target_metric: 'accuracy', privacy_budget: 1.0, total_rounds: 10 });
+            setForm({ name: '', description: '', model_architecture: 'mlp', target_metric: 'accuracy', privacy_budget: 1.0, total_rounds: 10 });
             setSelectedDatasetIds([]);
             fetchData();
         } catch (err) { setError(err.response?.data?.detail || 'Failed to create job'); }
@@ -85,8 +85,9 @@ export default function TrainingList() {
                             <div className="form-group">
                                 <label>Model Architecture</label>
                                 <select className="form-input" value={form.model_architecture} onChange={e => setForm(f => ({ ...f, model_architecture: (e.target as any).value }))}>
-                                    <option value="cnn">CNN</option>
-                                    <option value="lstm">LSTM</option>
+                                    <option value="mlp">MLP / Linear Classifier (10 Genes)</option>
+                                    <option value="cnn">CNN (Convolutional Neural Network)</option>
+                                    <option value="lstm">LSTM (Recurrent Network)</option>
                                     <option value="transformer">Transformer</option>
                                     <option value="resnet">ResNet</option>
                                     <option value="gnn">Graph Neural Network</option>
