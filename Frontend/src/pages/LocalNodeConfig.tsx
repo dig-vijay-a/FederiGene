@@ -6,13 +6,33 @@ import './LocalNodeConfig.css';
 export default function LocalNodeConfig() {
     usePageTitle('Local Node OS');
 
-    // Auto-detect the backend URL from the current page's origin
-    const detectedUrl = `${window.location.protocol}//${window.location.hostname}:8000`;
-    const [platformUrl, setPlatformUrl] = useState(detectedUrl);
+    // Auto-detect the backend URL
+    const getInitialUrl = () => {
+        const envUrl = (import.meta.env.VITE_API_URL || '').trim();
+        if (envUrl.startsWith('http')) {
+            return envUrl.replace(/\/api\/?$/, '');
+        }
+        // If on localhost / 127.0.0.1, default to port 8000
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return `${window.location.protocol}//${window.location.hostname}:8000`;
+        }
+        // In cloud / production deployment, use the origin
+        return window.location.origin;
+    };
+    const [platformUrl, setPlatformUrl] = useState(getInitialUrl());
     const [apiKey, setApiKey] = useState('');
     const [jobId, setJobId] = useState('');
     const [dataPath, setDataPath] = useState('');
     const [epochs, setEpochs] = useState(10);
+
+    const resolveApiUrl = (endpoint: string) => {
+        let base = (platformUrl || '').trim().replace(/\/+$/, '');
+        if (base.endsWith('/api')) {
+            base = base.slice(0, -4);
+        }
+        const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+        return `${base}/api${cleanEndpoint}`;
+    };
     
     const [isRunning, setIsRunning] = useState(false);
     const [logs, setLogs] = useState<any[]>([]);
@@ -53,8 +73,9 @@ export default function LocalNodeConfig() {
         addLog(`[System] Contacting FederiGene Platform...`, "info");
 
         try {
-            // REAL BACKEND VERIFICATION - uses platformUrl directly
-            const verifyRes = await fetch(`${platformUrl}/api/platform/node/verify`, {
+            // REAL BACKEND VERIFICATION
+            const targetUrl = resolveApiUrl('/platform/node/verify');
+            const verifyRes = await fetch(targetUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ api_key: apiKey, job_id: parseInt(jobId) })
@@ -74,7 +95,10 @@ export default function LocalNodeConfig() {
             // Proceed to real submission after check
             executeTrainingAndSubmit(res.job_name);
         } catch (error: any) {
-            const detail = error?.response?.data?.detail || error?.message || "Connection failed";
+            let detail = error?.response?.data?.detail || error?.message || "Connection failed";
+            if (detail === "Failed to fetch") {
+                detail = `Could not reach ${resolveApiUrl('/platform/node/verify')}. Check that your backend server is running and reachable.`;
+            }
             addLog(`❌ Authorization Failed: ${detail}`, "error");
             setIsRunning(false);
         }
@@ -107,7 +131,8 @@ export default function LocalNodeConfig() {
         try {
             // Valid base64 dummy weights (a minimal PyTorch-like binary blob)
             const dummyWeights = btoa(String.fromCharCode(...Array.from({length: 64}, () => Math.floor(Math.random() * 256))));
-            const submitRes = await fetch(`${platformUrl}/api/platform/training/${jobId}/submit`, {
+            const submitUrl = resolveApiUrl(`/platform/training/${jobId}/submit`);
+            const submitRes = await fetch(submitUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
