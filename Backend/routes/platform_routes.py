@@ -445,7 +445,7 @@ def predict_disease(model_id: int, req: PredictRequest, user: User = Depends(get
         torch.save(dummy_model.state_dict(), weight_path)
         
     model = nn.Linear(10, 2)
-    state = torch.load(weight_path, weights_only=True)
+    state = torch.load(weight_path, map_location=torch.device("cpu"), weights_only=True)  # nosemgrep: pickles-in-pytorch # nosec CWE-502
     model.load_state_dict(state)
     model.eval()
     

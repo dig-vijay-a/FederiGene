@@ -79,7 +79,7 @@ async def check_and_aggregate(job_id: int, round_num: int):
         for p in participants:
             weight_path = os.path.join("temp_weights", f"job_{job_id}_org_{p.org_id}_round_{round_num}.pt")
             if os.path.exists(weight_path):
-                state_dict = torch.load(weight_path, weights_only=True)  # nosemgrep
+                state_dict = torch.load(weight_path, map_location=torch.device("cpu"), weights_only=True)  # nosemgrep: pickles-in-pytorch # nosec CWE-502
                 state_dicts.append(state_dict)
             else:
                 print(f"[FL Engine] Missing weight file for org {p.org_id}. Skipping.")

@@ -60,7 +60,7 @@ class EdgeOptimizer:
 
             # Load the model back for processing
             model = DummyModel()
-            model.load_state_dict(torch.load(model_path))
+            model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu"), weights_only=True))  # nosemgrep: pickles-in-pytorch # nosec CWE-502
 
             # 2. Apply Pruning
             job["status"] = f"pruning_{(pruning_ratio*100):.0f}pct_sparcity"

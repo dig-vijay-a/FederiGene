@@ -44,7 +44,7 @@ def run_inference(weights_path=None):
     
     # 3. Load the model weights
     print(f"[Model Loader] Loading model weights from: {weights_path}")
-    state = torch.load(weights_path, weights_only=True)
+    state = torch.load(weights_path, map_location=torch.device("cpu"), weights_only=True)  # nosemgrep: pickles-in-pytorch # nosec CWE-502
     if "weight" in state and "fc.weight" not in state:
         state = {"fc.weight": state["weight"], "fc.bias": state["bias"]}
     model.load_state_dict(state)
